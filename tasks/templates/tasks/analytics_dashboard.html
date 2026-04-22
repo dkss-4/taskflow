@@ -1,0 +1,331 @@
+{% extends 'tasks/base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>📊 Analytics Dashboard</h1>
+    {% extends 'tasks/base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>📊 Analytics Dashboard</h1>
+    <a href="{% url 'tasks:task_list' %}" class="btn btn-secondary">← Back to Tasks</a>
+    </div>
+
+    
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <a href="?filter=all" class="btn btn-outline-secondary {% if current_filter == 'all' or not current_filter %}active{% endif %}">
+                📅 All Time
+            </a>
+            <a href="?filter=week" class="btn btn-outline-secondary {% if current_filter == 'week' %}active{% endif %}">
+                📆 Last 7 Days
+            </a>
+            <a href="?filter=month" class="btn btn-outline-secondary {% if current_filter == 'month' %}active{% endif %}">
+                📊 Last 30 Days
+            </a>
+            <a href="?filter=year" class="btn btn-outline-secondary {% if current_filter == 'year' %}active{% endif %}">
+                📈 Last Year
+            </a>
+        </div>
+        <small class="text-muted ms-3">
+            Filtering tasks by creation date
+        </small>
+    </div>
+
+
+
+    <div class="row mb-4">
+        
+    </div>
+    <a href="{% url 'tasks:task_list' %}" class="btn btn-secondary">← Back to Tasks</a>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Total Tasks</h5>
+                <h2 class="display-4">{{ total_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Completed</h5>
+                <h2 class="display-4">{{ completed_tasks }}</h2>
+                <small>{{ completion_rate }}% completion rate</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Pending</h5>
+                <h2 class="display-4">{{ pending_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">Overdue</h5>
+                <h2 class="display-4">{{ overdue_tasks }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>Tasks by Status</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>Tasks by Priority</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="priorityChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tasks Created Over Time -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Tasks Created (Last 30 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="trendChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Tasks due in next 7 days:</span>
+                        <span class="badge bg-info rounded-pill">{{ upcoming_tasks }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Most productive day:</span>
+                        <span class="badge bg-success rounded-pill">{{ most_productive_day }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>High priority tasks:</span>
+                        <span class="badge bg-danger rounded-pill">{{ priority_stats.high }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Medium priority tasks:</span>
+                        <span class="badge bg-warning rounded-pill">{{ priority_stats.medium }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>Low priority tasks:</span>
+                        <span class="badge bg-secondary rounded-pill">{{ priority_stats.low }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>Productivity Tips</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <strong>💡 Tip:</strong> Focus on high-priority tasks first!
+                </div>
+                <div class="alert alert-success">
+                    <strong>✅ Good job!</strong> You've completed {{ completion_rate }}% of your tasks.
+                </div>
+                {% if overdue_tasks > 0 %}
+                <div class="alert alert-warning">
+                    <strong>⚠️ Attention:</strong> You have {{ overdue_tasks }} overdue tasks. 
+                    <a href="{% url 'tasks:task_list' %}?status=pending">Review them now</a>
+                </div>
+                {% endif %}
+                {% if upcoming_tasks > 0 %}
+                <div class="alert alert-primary">
+                    <strong>📅 Planning:</strong> {{ upcoming_tasks }} tasks due in the next 7 days.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Status Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pending', 'In Progress', 'Done'],
+            datasets: [{
+                data: [{{ status_stats.pending }}, {{ status_stats.in_progress }}, {{ status_stats.done }}],
+                backgroundColor: ['#ffc107', '#0dcaf0', '#198754'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+    
+    // Priority Chart
+    const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+    new Chart(priorityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['High', 'Medium', 'Low'],
+            datasets: [{
+                label: 'Number of Tasks',
+                data: [{{ priority_stats.high }}, {{ priority_stats.medium }}, {{ priority_stats.low }}],
+                backgroundColor: ['#dc3545', '#fd7e14', '#198754'],
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+    
+    // Trend Chart
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_days|safe }},
+            datasets: [{
+                label: 'Tasks Created',
+                data: {{ chart_counts|safe }},
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'top' }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Status Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pending', 'In Progress', 'Done'],
+            datasets: [{
+                data: [{{ status_stats.pending }}, {{ status_stats.in_progress }}, {{ status_stats.done }}],
+                backgroundColor: ['#ffc107', '#0dcaf0', '#198754'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+    
+    // Priority Chart
+    const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+    new Chart(priorityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['High', 'Medium', 'Low'],
+            datasets: [{
+                label: 'Number of Tasks',
+                data: [{{ priority_stats.high }}, {{ priority_stats.medium }}, {{ priority_stats.low }}],
+                backgroundColor: ['#dc3545', '#fd7e14', '#198754'],
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+    
+    // Trend Chart,Using safe filter for JSON
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_days|safe }},
+            datasets: [{
+                label: 'Tasks Created',
+                data: {{ chart_counts|safe }},
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

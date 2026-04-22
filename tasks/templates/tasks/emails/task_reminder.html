@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Task Reminder</title>
+</head>
+<body>
+    <h2>Task Reminder</h2>
+    <p>Hello {{ user.username }},</p>
+    <p>Your task "{{ task.title }}" is due tomorrow!</p>
+    <p><strong>Due Date:</strong> {{ task.due_date|date:"F j, Y" }}</p>
+    <p><strong>Priority:</strong> {{ task.get_priority_display }}</p>
+    <a href="{{ site_url }}{% url 'tasks:task_detail' task.id %}">View Task</a>
+    <hr>
+    <p>TaskFlow Reminder</p>
+</body>
+</html>

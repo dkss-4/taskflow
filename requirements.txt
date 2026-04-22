@@ -1,0 +1,14 @@
+python==3.12.7,
+Django==5.2.13 ,
+asgiref==3.11.1, 
+sqlparse==0.5.5 ,
+tzdata==2026.1,
+django-environ==0.13.0 ,
+psycopg2-binary==2.9.11
+python-dotenv==0.21.0
+djangorestframework==3.17.1
+django-filter==25.2
+drf-spectacular==0.29.0
+pyright==1.1.408 
+dj_database_url==3.1.2
+gunicorn==25.3.0 ,whitenoise==6.12.0

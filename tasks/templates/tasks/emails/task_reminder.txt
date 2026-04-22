@@ -1,0 +1,11 @@
+Hello {{ user.username }},
+
+Your task "{{ task.title }}" is due tomorrow!
+
+Due Date: {{ task.due_date|date:"F j, Y" }}
+Priority: {{ task.get_priority_display }}
+
+View task at: {{ site_url }}{% url 'tasks:task_detail' task.id %}
+
+---
+TaskFlow Reminder

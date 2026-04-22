@@ -1,0 +1,53 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ task.title }}</h3>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ task.description|default:"No description provided." }}</p>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Priority:</strong>
+                        <span class="priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Status:</strong>
+                        <span class="status-badge status-{{ task.status }}">{{ task.get_status_display }}</span>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Due Date:</strong>
+                        {{ task.due_date|date:"F d, Y" }}
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted">Created: {{ task.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">Last updated: {{ task.updated_at|date:"M d, Y" }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="btn-group">
+                    <a href="{% url 'tasks:task_edit' task.id %}" class="btn btn-warning">Edit</a>
+                    <a href="{% url 'tasks:task_delete' task.id %}" class="btn btn-danger">Delete</a>
+                    <a href="{% url 'tasks:task_list' %}" class="btn btn-secondary">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
