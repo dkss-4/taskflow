@@ -60,13 +60,7 @@ A full-featured task management web application built with Django. Create, organ
 7. **Run development server**:-
     python manage.py runserver
 
-## Screenshots
 
-### Admin Panel - Task List
-![Admin Task List](screenshots/admin-list.png)
-
-### Admin Panel - Add Task
-![Add Task](screenshots/admin-add.png)
 
 ## Author
 

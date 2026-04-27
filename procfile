@@ -1,1 +1,1 @@
-web: gunicorn taskflow.wsgi:application
+web: gunicorn taskflow.wsgi:application --bind 0.0.0.0:8000

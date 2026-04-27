@@ -9,7 +9,7 @@ class Command(BaseCommand):
     help = 'Send email reminders for tasks due tomorrow'
     
     def add_arguments(self, parser):
-        # Optional: add a dry-run argument to test without sending emails
+        #dry-run argument to test without sending emails
         parser.add_argument(
             '--dry-run',
             action='store_true',

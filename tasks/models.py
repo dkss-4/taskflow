@@ -53,6 +53,8 @@ class ReminderLog(models.Model):
         ordering = ['-sent_at']
         verbose_name = 'Reminder Log'
         verbose_name_plural = 'Reminder Logs'
+
+        
     
     def __str__(self):
         return f"Reminder for {self.task.title} sent at {self.sent_at}"
