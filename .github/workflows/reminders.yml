@@ -32,3 +32,15 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           python manage.py send_reminders
+
+services:
+  - type: web
+    name: taskflow-sqsv
+    runtime: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+      python create_superuser.py  # ← ADD THIS LINE
+    startCommand: gunicorn taskflow.wsgi:application
