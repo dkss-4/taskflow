@@ -11,9 +11,10 @@ from django.db.models.functions import ExtractWeekDay
 from django.db.models import Count, Q
 from django.utils import timezone
 from datetime import timedelta
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import tasks
+import os
 
 # Registration View
 def register(request):
@@ -291,3 +292,21 @@ def analytics_dashboard(request):
     }
     
     return render(request, 'tasks/analytics_dashboard.html', context)
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.core.management import call_command
+
+@csrf_exempt
+def trigger_reminders(request):
+    """
+    This endpoint will be called by cron-job.org to trigger email reminders.
+    URL: /api/trigger-reminders/
+    """
+    key = request.GET.get('key', '')
+   
+    if key == os.getenv('CRON_SECRET_KEY', 'TimeFlyFast'):
+        call_command('send_reminders')
+        return JsonResponse({'status': 'success', 'message': 'Reminders sent'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid key'}, status=401)
