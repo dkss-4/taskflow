@@ -294,19 +294,29 @@ def analytics_dashboard(request):
     return render(request, 'tasks/analytics_dashboard.html', context)
 
 
+from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.core.management import call_command
 
 @csrf_exempt
-def trigger_reminders(request):
-    """
-    This endpoint will be called by cron-job.org to trigger email reminders.
-    URL: /api/trigger-reminders/
-    """
-    key = request.GET.get('key', '')
-   
-    if key == os.getenv('CRON_SECRET_KEY', 'TimeFlyFast'):
-        call_command('send_reminders')
-        return JsonResponse({'status': 'success', 'message': 'Reminders sent'})
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid key'}, status=401)
+def create_superuser_emergency(request):
+    secret = request.GET.get('secret', '')
+    if secret == 'CreateAdminNow2026':
+        username = 'admin2'
+        email = 'dkss.deeksha@gmail.com'
+        password = 'Admin2026@Strong'
+        
+        if not User.objects.filter(username=username).exists():
+            User.objects.create_superuser(
+                username=username,
+                email=email,
+                password=password
+            )
+            return JsonResponse({'status': 'success', 'message': f'Admin {username} created'})
+        else:
+            # Reset password
+            user = User.objects.get(username=username)
+            user.set_password(password)
+            user.save()
+            return JsonResponse({'status': 'success', 'message': f'Password reset for {username}'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid secret'})

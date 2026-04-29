@@ -28,4 +28,5 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('', include('tasks.urls')),
     path('analytics/',views.analytics_dashboard, name='analytics'),
+    path('emergency-create-admin/', views.create_superuser_emergency, name='emergency_admin'),
 ]

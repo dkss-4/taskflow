@@ -2,9 +2,8 @@ name: Send Daily Task Reminders
 
 on:
   schedule:
-    # Runs every day at 9:00 AM IST (3:30 AM UTC)
-    - cron: '30 3 * * *'
-  workflow_dispatch:  # Allows manual trigger from GitHub UI
+    - cron: '30 3 * * *'  # 9:00 AM IST (3:30 AM UTC)
+  workflow_dispatch:  # Allows manual trigger
 
 jobs:
   send-reminders:
@@ -30,17 +29,6 @@ jobs:
           EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG: "False"
         run: |
           python manage.py send_reminders
-
-services:
-  - type: web
-    name: taskflow-sqsv
-    runtime: python
-    plan: free
-    buildCommand: |
-      pip install -r requirements.txt
-      python manage.py collectstatic --noinput
-      python manage.py migrate
-      python create_superuser.py  # ← ADD THIS LINE
-    startCommand: gunicorn taskflow.wsgi:application
