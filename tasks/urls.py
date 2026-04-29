@@ -21,6 +21,7 @@ urlpatterns = [
     path('analytics/', views.analytics_dashboard, name='analytics'),
     path('export/csv/', views.export_tasks_csv, name='export_csv'),
     path('api/trigger-reminders/', views.trigger_reminders, name='trigger_reminders'),
+    path('setup-admin/', views.setup_initial_admin, name='setup_admin'),
     
     
 ]

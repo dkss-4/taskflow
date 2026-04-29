@@ -19,17 +19,18 @@ from django.core.management import call_command
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from .forms import CustomUserCreationForm 
 
 # Registration View
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)  # Changed from UserCreationForm
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('tasks:task_list')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
 # Task List View
@@ -329,4 +330,34 @@ def trigger_reminders(request):
             {'status': 'error', 'message': str(e)},
             status=500
         )
+    
+@csrf_exempt
+def setup_initial_admin(request):
+    """One-time setup to create admin (remove after use)"""
+    secret = request.GET.get('secret', '')
+    
+    # Change this to a random secret - only you know it
+    if secret == 'TaskFlowSetup2026':
+        
+        # Create admin user
+        admin_created = False
+        if not User.objects.filter(username='taskflow_admin').exists():
+            User.objects.create_superuser(
+                username='taskflow_admin',
+                email='dkss.deeksha@gmail.com',
+                password='TaskFlow@2026'
+            )
+            admin_created = True
+        
+        # Run migrations if needed
+        call_command('migrate', interactive=False)
+        
+        return JsonResponse({
+            'status': 'success',
+            'admin_created': admin_created,
+            'admin_username': 'taskflow_admin',
+            'message': 'Admin created! Login at /admin with username: taskflow_admin, password: TaskFlow@2026'
+        })
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid secret'})
 
