@@ -300,29 +300,6 @@ def analytics_dashboard(request):
 
 
 @csrf_exempt
-def create_superuser_emergency(request):
-    secret = request.GET.get('secret', '')
-    if secret == 'CreateAdminNow2026':
-        username = 'admin2'
-        email = 'dkss.deeksha@gmail.com'
-        password = 'Admin2026@Strong'
-        
-        if not User.objects.filter(username=username).exists():
-            User.objects.create_superuser(
-                username=username,
-                email=email,
-                password=password
-            )
-            return JsonResponse({'status': 'success', 'message': f'Admin {username} created'})
-        else:
-            # Reset password
-            user = User.objects.get(username=username)
-            user.set_password(password)
-            user.save()
-            return JsonResponse({'status': 'success', 'message': f'Password reset for {username}'})
-    return JsonResponse({'status': 'error', 'message': 'Invalid secret'})
-
-@csrf_exempt
 def trigger_reminders(request):
     """
     Endpoint to trigger email reminders.
@@ -353,26 +330,3 @@ def trigger_reminders(request):
             status=500
         )
 
-from django.contrib.auth.models import User
-from django.http import HttpResponse
-
-def reset_admin(request):
-    secret = request.GET.get('secret', '')
-    if secret == 'ResetAdminNow2026':
-        user, created = User.objects.get_or_create(
-            username='admin2',
-            defaults={
-                'email': 'dkss.deeksha@gmail.com',
-                'is_staff': True,
-                'is_superuser': True
-            }
-        )
-        user.set_password('Admin@2026Strong')
-        user.save()
-        return HttpResponse(f"""
-        <h2>✅ Admin Reset Complete</h2>
-        <p>Username: <strong>admin2</strong></p>
-        <p>Password: <strong>Admin@2026Strong</strong></p>
-        <p>Go to <a href="/admin/">/admin/</a> to login</p>
-        """)
-    return HttpResponse("Invalid secret key")
