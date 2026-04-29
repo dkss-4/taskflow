@@ -15,6 +15,10 @@ from django.http import HttpResponse,JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import tasks
 import os
+from django.core.management import call_command
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 # Registration View
 def register(request):
@@ -29,7 +33,6 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 # Task List View
-from django.core.paginator import Paginator  
 
 @login_required
 def task_list(request):
@@ -294,9 +297,7 @@ def analytics_dashboard(request):
     return render(request, 'tasks/analytics_dashboard.html', context)
 
 
-from django.contrib.auth.models import User
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+
 
 @csrf_exempt
 def create_superuser_emergency(request):
@@ -320,3 +321,34 @@ def create_superuser_emergency(request):
             user.save()
             return JsonResponse({'status': 'success', 'message': f'Password reset for {username}'})
     return JsonResponse({'status': 'error', 'message': 'Invalid secret'})
+
+@csrf_exempt
+def trigger_reminders(request):
+    """
+    Endpoint to trigger email reminders.
+    Called by cron-job.org or GitHub Actions.
+    URL: /api/trigger-reminders/?key=YOUR_SECRET_KEY
+    """
+    # Get the secret key from request or environment
+    key = request.GET.get('key', '')
+    expected_key = os.getenv('CRON_SECRET_KEY', 'TimeFlyFast')
+    
+    # Verify the secret key
+    if key != expected_key:
+        return JsonResponse(
+            {'status': 'error', 'message': 'Invalid secret key'},
+            status=401
+        )
+    
+    try:
+        # Run the send_reminders management command
+        call_command('send_reminders')
+        return JsonResponse(
+            {'status': 'success', 'message': 'Reminders sent successfully'},
+            status=200
+        )
+    except Exception as e:
+        return JsonResponse(
+            {'status': 'error', 'message': str(e)},
+            status=500
+        )
