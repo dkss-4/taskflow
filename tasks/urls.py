@@ -22,7 +22,6 @@ urlpatterns = [
     path('export/csv/', views.export_tasks_csv, name='export_csv'),
     path('api/trigger-reminders/', views.trigger_reminders, name='trigger_reminders'),
     path('setup-admin/', views.setup_initial_admin, name='setup_admin'),
-    path('fix-login/', views.fix_admin_login, name='fix_login'),
     
     
 ]
