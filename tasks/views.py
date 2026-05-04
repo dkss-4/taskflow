@@ -331,33 +331,30 @@ def trigger_reminders(request):
             status=500
         )
     
+
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
 @csrf_exempt
-def setup_initial_admin(request):
-    """One-time setup to create admin (remove after use)"""
+def fix_admin_login(request):
     secret = request.GET.get('secret', '')
-    
-    # Change this to a random secret - only you know it
-    if secret == 'TaskFlowSetup2026':
-        
-        # Create admin user
-        admin_created = False
-        if not User.objects.filter(username='taskflow_admin').exists():
+    if secret == 'YourSecretKey123':
+        try:
+            admin = User.objects.get(username='resumeadmin')
+            admin.set_password('Resume@2026')  # ✅ This creates the correct hash
+            admin.is_active = True
+            admin.is_staff = True
+            admin.is_superuser = True
+            admin.save()
+            return JsonResponse({'status': 'success', 'message': 'Password reset. Login with username: resumeadmin, password: Resume@2026'})
+        except User.DoesNotExist:
+            # Create if doesn't exist
             User.objects.create_superuser(
-                username='taskflow_admin',
+                username='resumeadmin',
                 email='dkss.deeksha@gmail.com',
-                password='TaskFlow@2026'
+                password='Resume@2026'
             )
-            admin_created = True
-        
-        # Run migrations if needed
-        call_command('migrate', interactive=False)
-        
-        return JsonResponse({
-            'status': 'success',
-            'admin_created': admin_created,
-            'admin_username': 'taskflow_admin',
-            'message': 'Admin created! Login at /admin with username: taskflow_admin, password: TaskFlow@2026'
-        })
-    
+            return JsonResponse({'status': 'success', 'message': 'Admin created'})
     return JsonResponse({'status': 'error', 'message': 'Invalid secret'})
 
